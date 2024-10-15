@@ -15,6 +15,12 @@ async function handleMessage(event, pageAccessToken) {
   const senderId = event.sender.id;
   const messageText = event.message.text.trim();
 
+  // Check if the message contains the word "prefix"
+  if (messageText.toLowerCase().includes('prefix')) {
+    sendMessage(senderId, { text: `prefix is "${prefix}"` }, pageAccessToken);
+    return;
+  }
+
   if (messageText.startsWith(prefix)) {
     const args = messageText.slice(prefix.length).split(' ');
     const commandName = args.shift().toLowerCase();
@@ -42,4 +48,4 @@ async function handleMessage(event, pageAccessToken) {
   }
 }
 
-module.exports = { handleMessage }; // Closing the object here
+module.exports = { handleMessage };

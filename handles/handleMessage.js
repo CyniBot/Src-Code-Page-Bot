@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 const { sendMessage } = require('./sendMessage');
 
 const commands = new Map();
@@ -13,11 +14,30 @@ for (const file of commandFiles) {
 
 async function handleMessage(event, pageAccessToken) {
   const senderId = event.sender.id;
-  const messageText = event.message.text.trim();
+  const messageText = event.message.text.trim().toLowerCase();
 
   // Check if the message contains the word "prefix"
-  if (messageText.toLowerCase().includes('prefix')) {
+  if (messageText.includes('prefix')) {
     sendMessage(senderId, { text: `prefix is "${prefix}"` }, pageAccessToken);
+    return;
+  }
+
+  // Check if the message contains the word "ai"
+  if (messageText.startsWith('ai')) {
+    const query = messageText.slice(2).trim(); // Extract the query after "ai"
+    const apiUrl = `https://www.samirxpikachu.run.place/gpt?content=${encodeURIComponent(query)}`;
+
+    try {
+      // Request the GPT API with the extracted query
+      const response = await axios.get(apiUrl);
+      const gptResponse = response.data.message.content;
+
+      // Send the response back to the user
+      sendMessage(senderId, { text: gptResponse }, pageAccessToken);
+    } catch (error) {
+      console.error('Error fetching AI response:', error);
+      sendMessage(senderId, { text: 'There was an error fetching the AI response.' }, pageAccessToken);
+    }
     return;
   }
 

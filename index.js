@@ -11,6 +11,10 @@ const VERIFY_TOKEN = 'pagebot';
 
 const PAGE_ACCESS_TOKEN = fs.readFileSync('token.txt', 'utf8').trim();
 
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
